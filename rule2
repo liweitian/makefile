@@ -1,0 +1,7 @@
+For a .c program, it may include many .h file and those .h file are changing.(add/delete) 
+
+main.o:main.c defs.h(main.c include defs.h)
+change to —> cc -M main.c/gcc -MM main.c
+
+
+Hence we could write cc -M main.c
