@@ -1,0 +1,42 @@
+CC = gcc
+LD = gcc
+
+CFLAGS = -fPIC -Wall -g
+LDFLAGS = -Wall -g
+#the following is a SUFFIX RULE
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
+
+#the following are MACROS
+Objects = hello.o here.o bye.o
+DYNLINKFLAGS = -g -shared -Wl,-soname,$@.0
+PROG_OBJS = main.o
+RM = rm -rf
+PROG = main
+LIBS = -lc -L. 
+LIB_FILES = libhello.so
+LIB_MINOR = $(LIB_FILES).0.1
+LIB_RELEASE = $(LIB_MINOR).0
+LIB_OBJS = libhello.o
+
+#the following is a TARGET
+all: $(LIB_FILES) $(PROG)
+
+#create the library with this RULE:
+libhello.so: $(Objects)
+	$(LD) $(DYNLINKFLAGS) -o $(LIB_RELEASE) $(Objects)
+	ln -sf $(LIB_RELEASE) $(LIB_MINOR)
+	ln -sf $(LIB_MINOR) $@
+	ln -sf $@ $@.0
+
+$(Objects): mylib.h
+	$(CC) $(CFLAGS) -c hello.c here.c bye.c
+
+
+#create the program with this RULE:
+$(PROG) : $(PROG_OBJS) $(LIB_FILES)
+	$(LD) $(LDFLAGS) -Wl,-rpath,. $(PROG_OBJS) $(LIBS) -lhello -o $(PROG)
+
+#clean up the files with this RULE:
+clean:
+	$(RM) $(PROG_OBJS) $(PROG) $(Objects) $(LIB_OBJS) $(LIB_FILES) $(LIB_RELEASE) $(LIB_MINOR) libhello.so.0

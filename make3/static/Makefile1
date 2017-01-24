@@ -1,0 +1,37 @@
+Objects = hello.o here.o bye.o
+
+# Which compiler
+CC = gcc
+
+# Where to install
+INSTDIR = .
+
+# Where are include files kept
+INCLUDE = .
+
+# Options for development
+CFLAGS = -g -Wall -ansi
+
+# Options for release
+# CFLAGS = -O -Wall -ansi
+
+# Local Libraries
+MYLIB = mylib.a
+
+main: main.o $(MYLIB)
+	$(CC) -o main main.o $(MYLIB)
+
+$(MYLIB): $(Objects)
+	ar rcs $(MYLIB) $(Objects)
+
+hello.o: hello.c mylib.h
+	$(CC) -c hello.c
+
+here.o: here.c mylib.h
+	$(CC) -c here.c
+
+bye.o: bye.c mylib.h
+	$(CC) -c bye.c
+
+clean:
+	-rm main.o $(Objects) $(MYLIB)
